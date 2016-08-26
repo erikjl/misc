@@ -1,0 +1,120 @@
+SSH into Riva Edge
+
+ssh -6 root@fe80::ff:1:1:10%eth1
+scp -6 test.txt root@[fe80::ff:1:1:10%eth1]:/root/
+
+-------------------setup------------------------
+sudo apt-get update
+sudo apt-get install minicom
+sudo apt-get install codeblocks
+
+
+-----------------Connect to Riva Edge------------------------
+sudo minicom -s
+hardware flow control OFF
+save as dfl &exit
+sudo minicom -D /dev/ttyUSB0 (or whatevr ttyUSB* your usb was mounted to - usually 0)
+login: root/itron
+
+------------------Riva ACT Setup-----------------------------
+sudo apt-get install isc-dhcp-server
+sudo apt-get install ntp
+edit /etc/network/interfaces
+edit /etc/dhcp/dhcp6.conf (make sure filename smae as on referenced in interfaces) 
+touch /var/lib/dhcp/dhcpd6.leases
+
+plug in USB-USB, reboot Riva Edge
+
+------------------Riva SDK-----------------------------
+cd ~/dev/
+mkdir itronriva
+cd itronriva
+
+wget http://itronriva.com/wp-content/uploads/2016/02/toolchain.tar.bz2
+
+tar xf toolchain.tar.bz2
+
+echo 'main() { puts("hello dude!"); }' > hello.c
+
+../toolchain/bin/armv7l-timesys-linux-uclibcgnueabi-gcc hello.c -o hello
+
+./hello (should error)
+put on USB & put on Riva, test on Riva
+
+
+------------------Riva SDK Setup in Code::Blocks--------------
+settings -> compiler -> copy GCC, rename "Riva GCC"
+repoint toolchain executable folder to Riva toolchain folder (../toolchain/)
+set toolchain executables (../toolchain/bin/armv7l-timesys-linux-uclibcgnueabi-gcc, etc)
+search directories.compiler -> ../toolchain/armv7l-timesys-linux-uclibgnueabi/include
+search directories.compiler -> ../toolchain/include
+search directories.linker -> ../toolchain/armv7l-timesys-linux-uclibgnueabi/lib
+search directories.compiler -> ../toolchain/lib
+
+new C::B project (console)
+change compiler to Riva
+compile
+try to run (should fail)
+move to Edge board & execute
+
+
+
+------------------git basics & github------------------------
+sudo apt-get install git
+githib.com create account
+cd to C::B project folder
+git init	initialize git in that folder (adds .git folder)
+git status
+git add -A
+git status
+git commit -m "add"
+
+git remote add origin https://github.com/erikjl/RivaPractice.git
+git remote -v (verify)
+git push origin master
+git remote show origin
+
+git remote rename [old] [new]
+git remote rm [name]
+------------------beaglebone------------------------
+sudo apt-get install gcc-arm-linux-gnueabi (ARM compiler (beaglebone))
+sudo apt-get install gcc-arm-linux-gnueabihf (hard float?)
+
+------------------opendnp3-----------------------
+******* NOT WORKING *********
+'sudo apt-get install cmake'
+'git clone https://github.com/automatak/dnp3'
+download asio: 'https://sourceforge.net/projects/asio' 
+unzip asio & move to /home/dev/asio-1.10.6/
+'export ASIO_HOME=~/dev/asio-1.10.6/include'
+'cmake . -G "CodeBlocks - Unix Makefiles" (cmake project generator)
+open with code::blocks
+rclick project -> build options -> set compiler to Riva
+build (FAILS)
+copy /dnp3/*so files to folder for Riva specific so files
+
+-------------------libcoap-----------------------
+cd ~/dev
+git clone https://github.com/obgm/libcoap
+sudo apt-get install automake libtool autoconf doxygen asciidoc
+./autogen.sh
+./configure
+make
+sudo make install
+cd ~/dev/libcoap/examples
+./coap-server -A 0.0.0.0
+Use Firefox Copper to connect to 127.0.0.1 & discover
+
+
+-----------------libcoap cross compile riva -------
+
+export PATH=$PATH:/home/erik/dev/toolchain/bin
+CPPFLAGS=-I/home/erik/dev/toolchain/include
+export LDFLAGS=-L/home/erik/dev/toolchain/lib
+ ./configure --host=armv7l-timesys-linux-uclibcgnueabi --disable-documentation --prefix=$HOME/
+
+sshpass -p "itron" scp -6 ./bin/Debug/*  root@\[fe80::ff:1:1:10%eth1]:/root
+
+
+
+
