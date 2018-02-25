@@ -1,0 +1,25 @@
+Phases
+
+-validate	validate the project is correct and all info is available
+-clean		deletes target directory
+-compile	compiles src code, geenrates any files, copies resources to /classes directory
+-test		runs tests
+-package	runs compile, runs tests, then packages (jar, war etc)
+-verify		runs check against package before deploy
+-install	runs package then install to local repo
+-deploy		runs install then deploys to corporate repo
+
+Dependancies
+
+groupid		usually package structure (com.apache.foo)
+artifactid	Name of the jar we want to use
+version	
+scope 		test (junit) - only need for this phase
+
+Plugins
+
+compiler	maven defaults to java 1.5, so override here
+jar		use to speficy manifest file location
+source		used to attach source code to a jar
+javadoc		attachs javadoc to jar
+	

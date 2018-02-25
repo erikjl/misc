@@ -1,0 +1,6 @@
+BASH SCRIPTING
+	Top line:		#!/bin/bash
+	Make executable:	chmod u+x <scriptname>
+	Enable anywhere:	Place sript in /usr/local/bin 
+	Random number:		RANDOM (http://tldp.org/LDP/abs/html/randomvar.html) 
+	Sleep/pause:		sleep 2s, sleep 1h, sleep .5 (no unit = seconds)
